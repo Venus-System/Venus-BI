@@ -625,7 +625,8 @@
                       "fieldName": "avg(score_media_movel_7d)",
                       "displayName": "Média móvel 7 dias"
                     }
-                  ]
+                  ],
+                  "displayName": "Score"
                 }
               },
               "data": {
@@ -870,7 +871,14 @@
                   "scale": {
                     "type": "quantitative"
                   },
-                  "displayName": "Score médio"
+                  "displayName": "Score médio",
+                  "format": {
+                    "type": "number-plain",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 1
+                    }
+                  }
                 },
                 "y": {
                   "fieldName": "categoria",
@@ -881,6 +889,9 @@
                     }
                   },
                   "displayName": "Categoria"
+                },
+                "label": {
+                  "show": true
                 }
               },
               "frame": {
@@ -891,9 +902,9 @@
           },
           "position": {
             "x": 0,
-            "y": 22,
-            "width": 4,
-            "height": 6
+            "y": 28,
+            "width": 12,
+            "height": 9
           }
         },
         {
@@ -944,9 +955,9 @@
             }
           },
           "position": {
-            "x": 4,
+            "x": 0,
             "y": 22,
-            "width": 4,
+            "width": 6,
             "height": 6
           }
         },
@@ -964,43 +975,73 @@
                       "expression": "`tipo_pele`"
                     },
                     {
-                      "name": "score_geral",
-                      "expression": "`score_geral`"
+                      "name": "min(score_geral)",
+                      "expression": "MIN(`score_geral`)"
+                    },
+                    {
+                      "name": "q1(score_geral)",
+                      "expression": "PERCENTILE(`score_geral`, 0.25)"
+                    },
+                    {
+                      "name": "median(score_geral)",
+                      "expression": "MEDIAN(`score_geral`)"
+                    },
+                    {
+                      "name": "q3(score_geral)",
+                      "expression": "PERCENTILE(`score_geral`, 0.75)"
+                    },
+                    {
+                      "name": "max(score_geral)",
+                      "expression": "MAX(`score_geral`)"
                     }
                   ],
-                  "disaggregated": true
+                  "disaggregated": false
                 }
               }
             ],
             "spec": {
-              "version": 1,
+              "version": 3,
               "widgetType": "box",
-              "encodings": {
-                "x": {
-                  "fieldName": "tipo_pele",
-                  "displayName": "Tipo de pele",
-                  "scale": {
-                    "type": "categorical"
-                  }
-                },
-                "y": {
-                  "fieldName": "score_geral",
-                  "displayName": "Score geral",
-                  "scale": {
-                    "type": "quantitative"
-                  }
-                }
-              },
               "frame": {
                 "showTitle": true,
                 "title": "Distribuição do score por tipo de pele"
+              },
+              "encodings": {
+                "x": {
+                  "fieldName": "tipo_pele",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Tipo de pele"
+                },
+                "y": {
+                  "whiskerStart": {
+                    "fieldName": "min(score_geral)"
+                  },
+                  "boxStart": {
+                    "fieldName": "q1(score_geral)"
+                  },
+                  "boxMid": {
+                    "fieldName": "median(score_geral)"
+                  },
+                  "boxEnd": {
+                    "fieldName": "q3(score_geral)"
+                  },
+                  "whiskerEnd": {
+                    "fieldName": "max(score_geral)"
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Score geral"
+                }
               }
             }
           },
           "position": {
-            "x": 8,
+            "x": 6,
             "y": 22,
-            "width": 4,
+            "width": 6,
             "height": 6
           }
         }
@@ -1178,12 +1219,8 @@
                       "expression": "`produto`"
                     },
                     {
-                      "name": "avg(score_catalogo)",
-                      "expression": "AVG(`score_catalogo`)"
-                    },
-                    {
-                      "name": "avg(score_personalizado)",
-                      "expression": "AVG(`score_personalizado`)"
+                      "name": "sum(diferenca)",
+                      "expression": "SUM(`diferenca`)"
                     }
                   ],
                   "disaggregated": false
@@ -1193,36 +1230,37 @@
             "spec": {
               "version": 3,
               "widgetType": "bar",
-              "mark": {
-                "layout": "group"
-              },
               "encodings": {
                 "x": {
+                  "fieldName": "sum(diferenca)",
                   "scale": {
                     "type": "quantitative"
                   },
-                  "fields": [
-                    {
-                      "fieldName": "avg(score_catalogo)",
-                      "displayName": "Score geral (catálogo)"
-                    },
-                    {
-                      "fieldName": "avg(score_personalizado)",
-                      "displayName": "Score personalizado"
+                  "displayName": "Diferença (personalizado − catálogo)",
+                  "format": {
+                    "type": "number-plain",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 1
                     }
-                  ]
+                  }
                 },
                 "y": {
                   "fieldName": "produto",
                   "scale": {
-                    "type": "categorical"
+                    "type": "categorical",
+                    "sort": {
+                      "by": "x"
+                    }
                   },
                   "displayName": "Produto"
                 }
               },
               "frame": {
                 "showTitle": true,
-                "title": "Score geral x score personalizado por produto"
+                "title": "Quanto a personalização muda a nota de cada produto",
+                "showDescription": true,
+                "description": "Pontos que a nota personalizada ganha ou perde em relação à nota geral do catálogo"
               }
             }
           },
@@ -1684,38 +1722,68 @@
                       "expression": "`product_category_name`"
                     },
                     {
-                      "name": "ingredientes",
-                      "expression": "`ingredientes`"
+                      "name": "min(ingredientes)",
+                      "expression": "MIN(`ingredientes`)"
+                    },
+                    {
+                      "name": "q1(ingredientes)",
+                      "expression": "PERCENTILE(`ingredientes`, 0.25)"
+                    },
+                    {
+                      "name": "median(ingredientes)",
+                      "expression": "MEDIAN(`ingredientes`)"
+                    },
+                    {
+                      "name": "q3(ingredientes)",
+                      "expression": "PERCENTILE(`ingredientes`, 0.75)"
+                    },
+                    {
+                      "name": "max(ingredientes)",
+                      "expression": "MAX(`ingredientes`)"
                     }
                   ],
-                  "disaggregated": true
+                  "disaggregated": false
                 }
               }
             ],
             "spec": {
-              "version": 1,
+              "version": 3,
               "widgetType": "box",
-              "encodings": {
-                "x": {
-                  "fieldName": "product_category_name",
-                  "displayName": "Categoria",
-                  "scale": {
-                    "type": "categorical"
-                  }
-                },
-                "y": {
-                  "fieldName": "ingredientes",
-                  "displayName": "Ingredientes no rótulo",
-                  "scale": {
-                    "type": "quantitative"
-                  }
-                }
-              },
               "frame": {
                 "showTitle": true,
                 "title": "Quantos ingredientes cada produto tem, por categoria",
                 "showDescription": true,
                 "description": "Categorias com pelo menos 4 produtos"
+              },
+              "encodings": {
+                "x": {
+                  "fieldName": "product_category_name",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Categoria"
+                },
+                "y": {
+                  "whiskerStart": {
+                    "fieldName": "min(ingredientes)"
+                  },
+                  "boxStart": {
+                    "fieldName": "q1(ingredientes)"
+                  },
+                  "boxMid": {
+                    "fieldName": "median(ingredientes)"
+                  },
+                  "boxEnd": {
+                    "fieldName": "q3(ingredientes)"
+                  },
+                  "whiskerEnd": {
+                    "fieldName": "max(ingredientes)"
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Ingredientes no rótulo"
+                }
               }
             }
           },
@@ -1812,7 +1880,7 @@
                 "showTitle": true,
                 "title": "Efeito dos ingredientes em cada perfil de pele",
                 "showDescription": true,
-                "description": "Proporção de ingredientes com benefício, risco ou contraindicação para o perfil"
+                "description": "Quantos ingredientes trazem benefício, são neutros, pedem atenção ou oferecem risco para cada perfil"
               }
             }
           },
@@ -1954,7 +2022,7 @@
                 "showTitle": true,
                 "title": "Contas cadastradas",
                 "showDescription": true,
-                "description": "Contas com status ativo (nao indica uso do app)"
+                "description": "Contas com status ativo (não indica uso do app)"
               },
               "version": 2,
               "widgetType": "counter",
