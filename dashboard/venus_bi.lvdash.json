@@ -625,8 +625,7 @@
                       "fieldName": "avg(score_media_movel_7d)",
                       "displayName": "Média móvel 7 dias"
                     }
-                  ],
-                  "displayName": "Score"
+                  ]
                 }
               },
               "data": {
@@ -1016,19 +1015,24 @@
                 },
                 "y": {
                   "whiskerStart": {
-                    "fieldName": "min(score_geral)"
+                    "fieldName": "min(score_geral)",
+                    "displayName": "Score geral"
                   },
                   "boxStart": {
-                    "fieldName": "q1(score_geral)"
+                    "fieldName": "q1(score_geral)",
+                    "displayName": "Score geral"
                   },
                   "boxMid": {
-                    "fieldName": "median(score_geral)"
+                    "fieldName": "median(score_geral)",
+                    "displayName": "Score geral"
                   },
                   "boxEnd": {
-                    "fieldName": "q3(score_geral)"
+                    "fieldName": "q3(score_geral)",
+                    "displayName": "Score geral"
                   },
                   "whiskerEnd": {
-                    "fieldName": "max(score_geral)"
+                    "fieldName": "max(score_geral)",
+                    "displayName": "Score geral"
                   },
                   "scale": {
                     "type": "quantitative"
@@ -1219,8 +1223,8 @@
                       "expression": "`produto`"
                     },
                     {
-                      "name": "sum(diferenca)",
-                      "expression": "SUM(`diferenca`)"
+                      "name": "avg(diferenca)",
+                      "expression": "AVG(`diferenca`)"
                     }
                   ],
                   "disaggregated": false
@@ -1232,7 +1236,7 @@
               "widgetType": "bar",
               "encodings": {
                 "x": {
-                  "fieldName": "sum(diferenca)",
+                  "fieldName": "avg(diferenca)",
                   "scale": {
                     "type": "quantitative"
                   },
@@ -1765,19 +1769,24 @@
                 },
                 "y": {
                   "whiskerStart": {
-                    "fieldName": "min(ingredientes)"
+                    "fieldName": "min(ingredientes)",
+                    "displayName": "Ingredientes no rótulo"
                   },
                   "boxStart": {
-                    "fieldName": "q1(ingredientes)"
+                    "fieldName": "q1(ingredientes)",
+                    "displayName": "Ingredientes no rótulo"
                   },
                   "boxMid": {
-                    "fieldName": "median(ingredientes)"
+                    "fieldName": "median(ingredientes)",
+                    "displayName": "Ingredientes no rótulo"
                   },
                   "boxEnd": {
-                    "fieldName": "q3(ingredientes)"
+                    "fieldName": "q3(ingredientes)",
+                    "displayName": "Ingredientes no rótulo"
                   },
                   "whiskerEnd": {
-                    "fieldName": "max(ingredientes)"
+                    "fieldName": "max(ingredientes)",
+                    "displayName": "Ingredientes no rótulo"
                   },
                   "scale": {
                     "type": "quantitative"
