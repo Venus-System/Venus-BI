@@ -69,6 +69,7 @@ dashboard/
   venus_bi.lvdash.json           definição do dashboard AI/BI
 docs/
   relatorio_gerencial_bi.html    relatório gerencial (abrir no navegador)
+  Relatorio_Gerencial_BI_Venus.pdf   o mesmo relatório em PDF (A4)
 pyproject.toml                   configuração do ruff (lint do CI)
 ```
 
