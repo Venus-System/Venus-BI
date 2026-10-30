@@ -296,6 +296,39 @@
 # COMMAND ----------
 
 # MAGIC %md
+# MAGIC ## Usuários por estado (mapa)
+# MAGIC
+# MAGIC Base do mapa do Brasil no dashboard. Conta contas ativas, contas com pelo menos uma análise e análises por estado.
+# MAGIC Só entra quem tem estado preenchido no app. Nenhum dado individual sai daqui: cada linha é um estado inteiro.
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC CREATE OR REPLACE TABLE workspace.gold.usuarios_por_estado AS
+# MAGIC WITH u AS (
+# MAGIC     SELECT user_key, uf, estado, latitude, longitude
+# MAGIC     FROM workspace.silver.dim_usuario
+# MAGIC     WHERE user_status = 'active' AND uf IS NOT NULL
+# MAGIC ), a AS (
+# MAGIC     SELECT user_key, COUNT(*) AS analises
+# MAGIC     FROM workspace.silver.fato_analise
+# MAGIC     WHERE origem_dado = 'real'
+# MAGIC     GROUP BY user_key
+# MAGIC )
+# MAGIC SELECT
+# MAGIC     u.uf,
+# MAGIC     u.estado,
+# MAGIC     COUNT(DISTINCT u.user_key)                    AS usuarios,
+# MAGIC     COUNT(DISTINCT a.user_key)                    AS usuarios_com_analise,
+# MAGIC     COALESCE(SUM(a.analises), 0)                  AS analises,
+# MAGIC     ROUND(AVG(u.latitude), 1)                     AS latitude,
+# MAGIC     ROUND(AVG(u.longitude), 1)                    AS longitude
+# MAGIC FROM u LEFT JOIN a ON a.user_key = u.user_key
+# MAGIC GROUP BY u.uf, u.estado;
+
+# COMMAND ----------
+
+# MAGIC %md
 # MAGIC ## Verificação
 # MAGIC
 # MAGIC Confere se os KPIs batem com a camada silver. Se não baterem, o notebook falha

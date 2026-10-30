@@ -125,6 +125,13 @@
         "FROM workspace.gold.personalizacao_por_produto\n",
         "ORDER BY classificacoes DESC\n"
       ]
+    },
+    {
+      "name": "ds_estados",
+      "displayName": "Usuários por estado",
+      "queryLines": [
+        "SELECT uf, estado, usuarios, usuarios_com_analise, analises, latitude, longitude FROM workspace.gold.usuarios_por_estado "
+      ]
     }
   ],
   "pages": [
@@ -2162,7 +2169,7 @@
           },
           "position": {
             "x": 0,
-            "y": 7,
+            "y": 15,
             "width": 6,
             "height": 5
           }
@@ -2219,7 +2226,7 @@
           },
           "position": {
             "x": 6,
-            "y": 7,
+            "y": 15,
             "width": 6,
             "height": 5
           }
@@ -2276,7 +2283,7 @@
           },
           "position": {
             "x": 0,
-            "y": 12,
+            "y": 20,
             "width": 6,
             "height": 5
           }
@@ -2333,9 +2340,145 @@
           },
           "position": {
             "x": 6,
-            "y": 12,
+            "y": 20,
             "width": 6,
             "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "mapa-estados",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_estados",
+                  "fields": [
+                    {
+                      "name": "estado",
+                      "expression": "`estado`"
+                    },
+                    {
+                      "name": "sum(usuarios)",
+                      "expression": "SUM(`usuarios`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "choropleth-map",
+              "encodings": {
+                "region": {
+                  "regionType": "mapbox-v4-admin",
+                  "admin0": {
+                    "type": "value",
+                    "value": "Brazil",
+                    "geographicRole": "admin0-name"
+                  },
+                  "admin1": {
+                    "fieldName": "estado",
+                    "type": "field",
+                    "geographicRole": "admin1-name",
+                    "displayName": "Estado"
+                  }
+                },
+                "color": {
+                  "fieldName": "sum(usuarios)",
+                  "displayName": "Usuários",
+                  "scale": {
+                    "type": "quantitative",
+                    "colorRamp": {
+                      "mode": "custom-sequential",
+                      "colors": {
+                        "start": "#CDB3E3",
+                        "end": "#321B5D"
+                      }
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Onde estão os usuários",
+                "showDescription": true,
+                "description": "Contas ativas com estado informado no app, por estado"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 7,
+            "width": 8,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "tabela-estados",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_estados",
+                  "fields": [
+                    {
+                      "name": "estado",
+                      "expression": "`estado`"
+                    },
+                    {
+                      "name": "usuarios",
+                      "expression": "`usuarios`"
+                    },
+                    {
+                      "name": "usuarios_com_analise",
+                      "expression": "`usuarios_com_analise`"
+                    },
+                    {
+                      "name": "analises",
+                      "expression": "`analises`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "estado",
+                    "displayName": "Estado"
+                  },
+                  {
+                    "fieldName": "usuarios",
+                    "displayName": "Usuários"
+                  },
+                  {
+                    "fieldName": "usuarios_com_analise",
+                    "displayName": "Com análise"
+                  },
+                  {
+                    "fieldName": "analises",
+                    "displayName": "Análises"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Usuários e análises por estado"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 7,
+            "width": 4,
+            "height": 8
           }
         }
       ],
