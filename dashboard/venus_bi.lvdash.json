@@ -1,0 +1,2766 @@
+{
+  "datasets": [
+    {
+      "name": "ds_cards",
+      "displayName": "KPIs (30 dias vs 30 anteriores)",
+      "queryLines": [
+        "SELECT\n",
+        "  origem_dado,\n",
+        "  MAX(CASE WHEN kpi = 'total_analises'            THEN valor_atual    END) AS analises_atual,\n",
+        "  MAX(CASE WHEN kpi = 'total_analises'            THEN valor_anterior END) AS analises_anterior,\n",
+        "  MAX(CASE WHEN kpi = 'usuarios_ativos'           THEN valor_atual    END) AS usuarios_atual,\n",
+        "  MAX(CASE WHEN kpi = 'usuarios_ativos'           THEN valor_anterior END) AS usuarios_anterior,\n",
+        "  MAX(CASE WHEN kpi = 'taxa_sucesso'              THEN valor_atual    END) AS sucesso_atual,\n",
+        "  MAX(CASE WHEN kpi = 'taxa_sucesso'              THEN valor_anterior END) AS sucesso_anterior,\n",
+        "  MAX(CASE WHEN kpi = 'score_medio'               THEN valor_atual    END) AS score_atual,\n",
+        "  MAX(CASE WHEN kpi = 'score_medio'               THEN valor_anterior END) AS score_anterior,\n",
+        "  MAX(CASE WHEN kpi = 'pct_contraindicados'       THEN valor_atual    END) AS contraindicados_atual,\n",
+        "  MAX(CASE WHEN kpi = 'pct_contraindicados'       THEN valor_anterior END) AS contraindicados_anterior,\n",
+        "  MAX(CASE WHEN kpi = 'score_personalizado_medio' THEN valor_atual    END) AS personalizado_atual,\n",
+        "  MAX(CASE WHEN kpi = 'score_personalizado_medio' THEN valor_anterior END) AS personalizado_anterior,\n",
+        "  MAX(CASE WHEN kpi = 'cobertura_personalizacao'  THEN valor_atual    END) AS cobertura_atual,\n",
+        "  MAX(CASE WHEN kpi = 'cobertura_personalizacao'  THEN valor_anterior END) AS cobertura_anterior\n",
+        "FROM workspace.gold.kpi_cards\n",
+        "GROUP BY origem_dado\n"
+      ]
+    },
+    {
+      "name": "ds_diario",
+      "displayName": "Evolução diária",
+      "queryLines": [
+        "SELECT origem_dado, date_key AS data, analises, analises_acumuladas, usuarios_ativos,\n",
+        "       taxa_sucesso, score_medio, score_media_movel_7d, pct_contraindicados\n",
+        "FROM workspace.gold.kpi_diario\n",
+        "ORDER BY data\n"
+      ]
+    },
+    {
+      "name": "ds_recomendacao",
+      "displayName": "Recomendação por perfil",
+      "queryLines": [
+        "SELECT origem_dado, CASE skin_type WHEN 'oily' THEN 'Oleosa' WHEN 'dry' THEN 'Seca' WHEN 'combination' THEN 'Mista' WHEN 'sensitive' THEN 'Sensível' WHEN 'normal' THEN 'Normal' WHEN 'nao_informado' THEN 'Não informado' ELSE skin_type END AS tipo_pele, CASE hair_pattern WHEN 'nao_informado' THEN 'Não informado' ELSE hair_pattern END AS tipo_cabelo, CASE age_range WHEN 'age_13_17' THEN '13 a 17 anos' WHEN 'age_18_24' THEN '18 a 24 anos' WHEN 'age_25_34' THEN '25 a 34 anos' WHEN 'age_35_44' THEN '35 a 44 anos' WHEN 'age_45_54' THEN '45 a 54 anos' WHEN 'age_55_plus' THEN '55 anos ou mais' WHEN 'nao_informado' THEN 'Não informado' ELSE age_range END AS faixa_etaria, CASE skin_sensitivity WHEN 'low' THEN 'Baixa' WHEN 'medium' THEN 'Média' WHEN 'high' THEN 'Alta' WHEN 'nao_informado' THEN 'Não informado' ELSE skin_sensitivity END AS sensibilidade, CASE WHEN is_pregnant THEN 'Gestante' ELSE 'Não gestante' END AS gestante, CASE recommendation_level WHEN 'ideal' THEN '1. Ideal' WHEN 'recommended' THEN '2. Recomendado' WHEN 'acceptable' THEN '3. Aceitável' WHEN 'not_recommended' THEN '4. Não recomendado' WHEN 'contraindicated' THEN '5. Contraindicado' ELSE recommendation_level END AS recomendacao, classificacoes, score_final_medio, compatibilidade_media FROM workspace.gold.recomendacao_por_perfil "
+      ]
+    },
+    {
+      "name": "ds_produtos",
+      "displayName": "Score por produto",
+      "queryLines": [
+        "SELECT origem_dado, product_category_name AS categoria, brand_name AS marca,\n",
+        "       CASE WHEN marca_brasileira THEN 'Brasileira' ELSE 'Internacional' END AS origem_marca,\n",
+        "       product_name AS produto, analises, score_medio, score_saude, score_ambiental, score_etico\n",
+        "FROM workspace.gold.score_por_produto\n"
+      ]
+    },
+    {
+      "name": "ds_detalhe",
+      "displayName": "Detalhe por análise",
+      "queryLines": [
+        "SELECT origem_dado, date_key AS data, CASE analysis_status WHEN 'completed' THEN 'Concluída' WHEN 'failed' THEN 'Falhou' WHEN 'processing' THEN 'Em processamento' WHEN 'pending' THEN 'Pendente' ELSE analysis_status END AS status, overall_score AS score_geral, processing_time_ms AS tempo_ms, CASE skin_type WHEN 'oily' THEN 'Oleosa' WHEN 'dry' THEN 'Seca' WHEN 'combination' THEN 'Mista' WHEN 'sensitive' THEN 'Sensível' WHEN 'normal' THEN 'Normal' WHEN 'nao_informado' THEN 'Não informado' ELSE skin_type END AS tipo_pele, CASE age_range WHEN 'age_13_17' THEN '13 a 17 anos' WHEN 'age_18_24' THEN '18 a 24 anos' WHEN 'age_25_34' THEN '25 a 34 anos' WHEN 'age_35_44' THEN '35 a 44 anos' WHEN 'age_45_54' THEN '45 a 54 anos' WHEN 'age_55_plus' THEN '55 anos ou mais' WHEN 'nao_informado' THEN 'Não informado' ELSE age_range END AS faixa_etaria, product_category_name AS categoria, brand_name AS marca, final_score AS score_personalizado, compatibility_percentage AS compatibilidade FROM workspace.gold.analise_detalhe "
+      ]
+    },
+    {
+      "name": "ds_usuarios",
+      "displayName": "Perfil da base de usuários",
+      "queryLines": [
+        "SELECT CASE skin_type WHEN 'oily' THEN 'Oleosa' WHEN 'dry' THEN 'Seca' WHEN 'combination' THEN 'Mista' WHEN 'sensitive' THEN 'Sensível' WHEN 'normal' THEN 'Normal' WHEN 'nao_informado' THEN 'Não informado' ELSE skin_type END AS tipo_pele, CASE hair_pattern WHEN 'nao_informado' THEN 'Não informado' ELSE hair_pattern END AS tipo_cabelo, CASE age_range WHEN 'age_13_17' THEN '13 a 17 anos' WHEN 'age_18_24' THEN '18 a 24 anos' WHEN 'age_25_34' THEN '25 a 34 anos' WHEN 'age_35_44' THEN '35 a 44 anos' WHEN 'age_45_54' THEN '45 a 54 anos' WHEN 'age_55_plus' THEN '55 anos ou mais' WHEN 'nao_informado' THEN 'Não informado' ELSE age_range END AS faixa_etaria, CASE skin_sensitivity WHEN 'low' THEN 'Baixa' WHEN 'medium' THEN 'Média' WHEN 'high' THEN 'Alta' WHEN 'nao_informado' THEN 'Não informado' ELSE skin_sensitivity END AS sensibilidade, CASE gender WHEN 'female' THEN 'Feminino' WHEN 'male' THEN 'Masculino' WHEN 'non_binary' THEN 'Não binário' WHEN 'prefer_not_say' THEN 'Prefere não dizer' WHEN 'nao_informado' THEN 'Não informado' ELSE gender END AS genero, CASE WHEN acne_prone THEN 'Sim' ELSE 'Não' END AS propensao_acne, CASE WHEN tem_perfil_preenchido THEN 'Preenchido' ELSE 'Sem perfil' END AS perfil, usuarios FROM workspace.gold.perfil_usuarios "
+      ]
+    },
+    {
+      "name": "ds_validacao",
+      "displayName": "Última validação do pipeline",
+      "queryLines": [
+        "SELECT verificacao, status, detalhe, executado_em\n",
+        "FROM workspace.gold.validacao_kpis\n",
+        "QUALIFY RANK() OVER (ORDER BY executado_em DESC) = 1\n"
+      ]
+    },
+    {
+      "name": "ds_cat_resumo",
+      "displayName": "Resumo do catálogo",
+      "queryLines": [
+        "SELECT * FROM workspace.gold.catalogo_resumo\n"
+      ]
+    },
+    {
+      "name": "ds_ing_risco",
+      "displayName": "Ingredientes por risco",
+      "queryLines": [
+        "SELECT * FROM workspace.gold.ingredientes_por_risco\n"
+      ]
+    },
+    {
+      "name": "ds_ing_top",
+      "displayName": "Ingredientes mais usados",
+      "queryLines": [
+        "SELECT ranking, ingrediente, categoria_ingrediente, faixa_irritacao,\n",
+        "       CASE WHEN is_comedogenico THEN 'Sim' ELSE 'Não' END AS comedogenico, produtos, vezes_primeiro_ingrediente\n",
+        "FROM workspace.gold.ingredientes_mais_usados\n",
+        "WHERE ranking <= 15\n",
+        "ORDER BY ranking, ingrediente\n"
+      ]
+    },
+    {
+      "name": "ds_composicao",
+      "displayName": "Composição dos produtos",
+      "queryLines": [
+        "SELECT c.*\n",
+        "FROM workspace.gold.composicao_produto c\n",
+        "WHERE c.product_category_name IN (\n",
+        "  SELECT product_category_name FROM workspace.gold.composicao_produto GROUP BY 1 HAVING COUNT(*) >= 4)\n"
+      ]
+    },
+    {
+      "name": "ds_efeitos",
+      "displayName": "Efeitos por perfil",
+      "queryLines": [
+        "SELECT categoria_tag, tag_perfil, CASE tipo_efeito WHEN 'benefit' THEN '1. Benefício' WHEN 'neutral' THEN '2. Neutro' WHEN 'warning' THEN '3. Atenção' WHEN 'risk' THEN '4. Risco' WHEN 'contraindication' THEN '5. Contraindicação' ELSE tipo_efeito END AS tipo_efeito, ingredientes FROM workspace.gold.efeitos_por_perfil "
+      ]
+    },
+    {
+      "name": "ds_personalizacao",
+      "displayName": "Catálogo x personalizado",
+      "queryLines": [
+        "SELECT origem_dado, product_name AS produto, brand_name AS marca, product_category_name AS categoria,\n",
+        "       classificacoes, score_catalogo, score_personalizado, diferenca, contraindicacoes\n",
+        "FROM workspace.gold.personalizacao_por_produto\n",
+        "ORDER BY classificacoes DESC\n"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "visao-geral",
+      "displayName": "Visão geral",
+      "layout": [
+        {
+          "widget": {
+            "name": "titulo",
+            "multilineTextboxSpec": {
+              "lines": [
+                "# Venus — uso e recomendações\n",
+                "\n",
+                "Como os usuários usam o Venus e que tipo de recomendação cada perfil recebe. Dados do **ambiente de QA**, gerados pelos testes da aplicação, atualizados diariamente pelo pipeline bronze → silver → gold. Os cards comparam os últimos 7 dias com os 7 anteriores."
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-analises",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_cards",
+                  "fields": [
+                    {
+                      "name": "sum(analises_atual)",
+                      "expression": "SUM(`analises_atual`)"
+                    },
+                    {
+                      "name": "sum(analises_anterior)",
+                      "expression": "SUM(`analises_anterior`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(analises_atual)",
+                  "displayName": "Últimos 7 dias",
+                  "format": {
+                    "type": "number-plain",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 1
+                    }
+                  }
+                },
+                "target": {
+                  "fieldName": "sum(analises_anterior)",
+                  "displayName": "7 dias anteriores"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Análises",
+                "showDescription": true,
+                "description": "Total de análises de produtos — vs. 7 dias anteriores"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-usuarios",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_cards",
+                  "fields": [
+                    {
+                      "name": "sum(usuarios_atual)",
+                      "expression": "SUM(`usuarios_atual`)"
+                    },
+                    {
+                      "name": "sum(usuarios_anterior)",
+                      "expression": "SUM(`usuarios_anterior`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(usuarios_atual)",
+                  "displayName": "Últimos 7 dias",
+                  "format": {
+                    "type": "number-plain",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 1
+                    }
+                  }
+                },
+                "target": {
+                  "fieldName": "sum(usuarios_anterior)",
+                  "displayName": "7 dias anteriores"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Usuários ativos",
+                "showDescription": true,
+                "description": "Usuários com ao menos 1 análise — vs. 7 dias anteriores"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 2,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-sucesso",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_cards",
+                  "fields": [
+                    {
+                      "name": "sum(personalizado_atual)",
+                      "expression": "SUM(`personalizado_atual`)"
+                    },
+                    {
+                      "name": "sum(personalizado_anterior)",
+                      "expression": "SUM(`personalizado_anterior`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(personalizado_atual)",
+                  "displayName": "Últimos 7 dias",
+                  "format": {
+                    "type": "number-plain",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 1
+                    }
+                  }
+                },
+                "target": {
+                  "fieldName": "sum(personalizado_anterior)",
+                  "displayName": "7 dias anteriores"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Score personalizado médio",
+                "showDescription": true,
+                "description": "Nota média que o produto recebeu para o perfil de quem analisou — vs. 7 dias anteriores"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 2,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-score",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_cards",
+                  "fields": [
+                    {
+                      "name": "sum(score_atual)",
+                      "expression": "SUM(`score_atual`)"
+                    },
+                    {
+                      "name": "sum(score_anterior)",
+                      "expression": "SUM(`score_anterior`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(score_atual)",
+                  "displayName": "Últimos 7 dias",
+                  "format": {
+                    "type": "number-plain",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 1
+                    }
+                  }
+                },
+                "target": {
+                  "fieldName": "sum(score_anterior)",
+                  "displayName": "7 dias anteriores"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Score geral médio",
+                "showDescription": true,
+                "description": "Média do score geral das análises — vs. 7 dias anteriores"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 5,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-contra",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_cards",
+                  "fields": [
+                    {
+                      "name": "sum(contraindicados_atual)",
+                      "expression": "SUM(`contraindicados_atual`)"
+                    },
+                    {
+                      "name": "sum(contraindicados_anterior)",
+                      "expression": "SUM(`contraindicados_anterior`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(contraindicados_atual)",
+                  "displayName": "Últimos 7 dias",
+                  "format": {
+                    "type": "number-plain",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 1
+                    }
+                  }
+                },
+                "target": {
+                  "fieldName": "sum(contraindicados_anterior)",
+                  "displayName": "7 dias anteriores"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Contraindicados (%)",
+                "showDescription": true,
+                "description": "% das classificações contraindicadas — vs. 7 dias anteriores"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 5,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-compat",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_cards",
+                  "fields": [
+                    {
+                      "name": "sum(cobertura_atual)",
+                      "expression": "SUM(`cobertura_atual`)"
+                    },
+                    {
+                      "name": "sum(cobertura_anterior)",
+                      "expression": "SUM(`cobertura_anterior`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(cobertura_atual)",
+                  "displayName": "Últimos 7 dias",
+                  "format": {
+                    "type": "number-plain",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 1
+                    }
+                  }
+                },
+                "target": {
+                  "fieldName": "sum(cobertura_anterior)",
+                  "displayName": "7 dias anteriores"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Cobertura da personalização (%)",
+                "showDescription": true,
+                "description": "Análises com score personalizado ÷ total — vs. 7 dias anteriores"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 5,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "sec-tempo",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## Evolução no tempo"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 8,
+            "width": 12,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "linha-analises",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_diario",
+                  "fields": [
+                    {
+                      "name": "daily(data)",
+                      "expression": "DATE_TRUNC(\"DAY\", `data`)"
+                    },
+                    {
+                      "name": "sum(analises)",
+                      "expression": "SUM(`analises`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Análises por dia",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "daily(data)",
+                  "displayName": "Dia",
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(analises)",
+                  "displayName": "Análises",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 9,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "linha-score",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_diario",
+                  "fields": [
+                    {
+                      "name": "daily(data)",
+                      "expression": "DATE_TRUNC(\"DAY\", `data`)"
+                    },
+                    {
+                      "name": "avg(score_medio)",
+                      "expression": "AVG(`score_medio`)"
+                    },
+                    {
+                      "name": "avg(score_media_movel_7d)",
+                      "expression": "AVG(`score_media_movel_7d`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Score médio das análises",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "daily(data)",
+                  "displayName": "Dia",
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "y": {
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "fields": [
+                    {
+                      "fieldName": "avg(score_medio)",
+                      "displayName": "Score do dia"
+                    },
+                    {
+                      "fieldName": "avg(score_media_movel_7d)",
+                      "displayName": "Média móvel 7 dias"
+                    }
+                  ]
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 9,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "sec-perfil",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## Perfil recomendado"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 14,
+            "width": 12,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "barra-recomendacao-pele",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_recomendacao",
+                  "fields": [
+                    {
+                      "name": "recomendacao",
+                      "expression": "`recomendacao`"
+                    },
+                    {
+                      "name": "tipo_pele",
+                      "expression": "`tipo_pele`"
+                    },
+                    {
+                      "name": "sum(classificacoes)",
+                      "expression": "SUM(`classificacoes`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": {
+                  "value": "Que recomendação cada tipo de pele recebe",
+                  "fields": []
+                },
+                "description": {
+                  "value": "Proporção dos níveis de recomendação por tipo de pele",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "tipo_pele",
+                  "displayName": "Tipo de pele",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(classificacoes)",
+                  "displayName": "Classificações",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "recomendacao",
+                  "displayName": "Recomendação",
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "1. Ideal",
+                        "color": "#321B5D"
+                      },
+                      {
+                        "value": "2. Recomendado",
+                        "color": "#580BA5"
+                      },
+                      {
+                        "value": "3. Aceitável",
+                        "color": "#CDB3E3"
+                      },
+                      {
+                        "value": "4. Não recomendado",
+                        "color": "#9A9AA2"
+                      },
+                      {
+                        "value": "5. Contraindicado",
+                        "color": "#A21561"
+                      }
+                    ]
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 15,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "barra-compat-idade",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_detalhe",
+                  "fields": [
+                    {
+                      "name": "faixa_etaria",
+                      "expression": "`faixa_etaria`"
+                    },
+                    {
+                      "name": "avg(score_personalizado)",
+                      "expression": "AVG(`score_personalizado`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "faixa_etaria",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "alphabetical"
+                    }
+                  },
+                  "displayName": "Faixa etária"
+                },
+                "y": {
+                  "fieldName": "avg(score_personalizado)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Score personalizado médio",
+                  "format": {
+                    "type": "number-plain",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 1
+                    }
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Score personalizado médio por faixa etária",
+                "showDescription": true,
+                "description": "Média das notas personalizadas recebidas por quem tem cada faixa etária"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 15,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "sec-produtos",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## Produtos e distribuições"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 21,
+            "width": 12,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "barra-categoria",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_produtos",
+                  "fields": [
+                    {
+                      "name": "categoria",
+                      "expression": "`categoria`"
+                    },
+                    {
+                      "name": "avg(score_medio)",
+                      "expression": "AVG(`score_medio`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "avg(score_medio)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Score médio"
+                },
+                "y": {
+                  "fieldName": "categoria",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "value"
+                    }
+                  },
+                  "displayName": "Categoria"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Score médio dos produtos por categoria"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 22,
+            "width": 4,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "histograma-score",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_detalhe",
+                  "fields": [
+                    {
+                      "name": "bin(score_geral, binWidth=10)",
+                      "expression": "BIN_FLOOR(`score_geral`, 10)"
+                    },
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "histogram",
+              "encodings": {
+                "x": {
+                  "fieldName": "bin(score_geral, binWidth=10)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Score geral"
+                },
+                "y": {
+                  "fieldName": "count(*)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Análises"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Distribuição do score geral"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 22,
+            "width": 4,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "box-tempo",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_detalhe",
+                  "fields": [
+                    {
+                      "name": "tipo_pele",
+                      "expression": "`tipo_pele`"
+                    },
+                    {
+                      "name": "score_geral",
+                      "expression": "`score_geral`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "box",
+              "encodings": {
+                "x": {
+                  "fieldName": "tipo_pele",
+                  "displayName": "Tipo de pele",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "score_geral",
+                  "displayName": "Score geral",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Distribuição do score por tipo de pele"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 22,
+            "width": 4,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "personalizacao",
+      "displayName": "Personalização",
+      "layout": [
+        {
+          "widget": {
+            "name": "titulo-personalizacao",
+            "multilineTextboxSpec": {
+              "lines": [
+                "# Personalização\n",
+                "\n",
+                "O score geral de um produto vale para todo mundo; o score personalizado é a nota que ele recebe para o perfil de quem analisa. Quanto maior a diferença, mais a personalização mudou a recomendação."
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "pers-kpi-0",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_personalizacao",
+                  "fields": [
+                    {
+                      "name": "sum(classificacoes)",
+                      "expression": "SUM(`classificacoes`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(classificacoes)",
+                  "displayName": "Classificações personalizadas"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Classificações personalizadas"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "pers-kpi-1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_personalizacao",
+                  "fields": [
+                    {
+                      "name": "avg(score_catalogo)",
+                      "expression": "AVG(`score_catalogo`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(score_catalogo)",
+                  "displayName": "Score geral médio (catálogo)",
+                  "format": {
+                    "type": "number-plain",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 1
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Score geral médio (catálogo)"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 2,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "pers-kpi-2",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_personalizacao",
+                  "fields": [
+                    {
+                      "name": "avg(score_personalizado)",
+                      "expression": "AVG(`score_personalizado`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(score_personalizado)",
+                  "displayName": "Score personalizado médio",
+                  "format": {
+                    "type": "number-plain",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 1
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Score personalizado médio"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 2,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "pers-barras",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_personalizacao",
+                  "fields": [
+                    {
+                      "name": "produto",
+                      "expression": "`produto`"
+                    },
+                    {
+                      "name": "avg(score_catalogo)",
+                      "expression": "AVG(`score_catalogo`)"
+                    },
+                    {
+                      "name": "avg(score_personalizado)",
+                      "expression": "AVG(`score_personalizado`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "mark": {
+                "layout": "group"
+              },
+              "encodings": {
+                "x": {
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "fields": [
+                    {
+                      "fieldName": "avg(score_catalogo)",
+                      "displayName": "Score geral (catálogo)"
+                    },
+                    {
+                      "fieldName": "avg(score_personalizado)",
+                      "displayName": "Score personalizado"
+                    }
+                  ]
+                },
+                "y": {
+                  "fieldName": "produto",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Produto"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Score geral x score personalizado por produto"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 5,
+            "width": 7,
+            "height": 10
+          }
+        },
+        {
+          "widget": {
+            "name": "pers-dispersao",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_personalizacao",
+                  "fields": [
+                    {
+                      "name": "score_catalogo",
+                      "expression": "`score_catalogo`"
+                    },
+                    {
+                      "name": "score_personalizado",
+                      "expression": "`score_personalizado`"
+                    },
+                    {
+                      "name": "categoria",
+                      "expression": "`categoria`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "scatter",
+              "encodings": {
+                "x": {
+                  "fieldName": "score_catalogo",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Score geral (catálogo)"
+                },
+                "y": {
+                  "fieldName": "score_personalizado",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Score personalizado"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Cada ponto é um produto",
+                "showDescription": true,
+                "description": "Pontos abaixo da diagonal: a personalização baixou a nota"
+              }
+            }
+          },
+          "position": {
+            "x": 7,
+            "y": 5,
+            "width": 5,
+            "height": 10
+          }
+        },
+        {
+          "widget": {
+            "name": "pers-tabela",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_personalizacao",
+                  "fields": [
+                    {
+                      "name": "produto",
+                      "expression": "`produto`"
+                    },
+                    {
+                      "name": "marca",
+                      "expression": "`marca`"
+                    },
+                    {
+                      "name": "categoria",
+                      "expression": "`categoria`"
+                    },
+                    {
+                      "name": "classificacoes",
+                      "expression": "`classificacoes`"
+                    },
+                    {
+                      "name": "score_catalogo",
+                      "expression": "`score_catalogo`"
+                    },
+                    {
+                      "name": "score_personalizado",
+                      "expression": "`score_personalizado`"
+                    },
+                    {
+                      "name": "diferenca",
+                      "expression": "`diferenca`"
+                    },
+                    {
+                      "name": "contraindicacoes",
+                      "expression": "`contraindicacoes`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "produto",
+                    "displayName": "Produto"
+                  },
+                  {
+                    "fieldName": "marca",
+                    "displayName": "Marca"
+                  },
+                  {
+                    "fieldName": "categoria",
+                    "displayName": "Categoria"
+                  },
+                  {
+                    "fieldName": "classificacoes",
+                    "displayName": "Classificações"
+                  },
+                  {
+                    "fieldName": "score_catalogo",
+                    "displayName": "Score geral"
+                  },
+                  {
+                    "fieldName": "score_personalizado",
+                    "displayName": "Score personalizado"
+                  },
+                  {
+                    "fieldName": "diferenca",
+                    "displayName": "Diferença"
+                  },
+                  {
+                    "fieldName": "contraindicacoes",
+                    "displayName": "Contraindicações"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Detalhe por produto"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 15,
+            "width": 12,
+            "height": 7
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "catalogo",
+      "displayName": "Catálogo e ingredientes",
+      "layout": [
+        {
+          "widget": {
+            "name": "titulo-catalogo",
+            "multilineTextboxSpec": {
+              "lines": [
+                "# Catálogo e ingredientes\n",
+                "\n",
+                "O que o Venus sabe sobre os produtos: ingredientes catalogados (bases ANVISA, UE e PubChem), composição dos produtos e quais ingredientes beneficiam ou oferecem risco a cada perfil. Não depende de uso do app."
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "cat-kpi-0",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_cat_resumo",
+                  "fields": [
+                    {
+                      "name": "ingredientes_catalogados",
+                      "expression": "`ingredientes_catalogados`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "ingredientes_catalogados",
+                  "displayName": "Ingredientes catalogados"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Ingredientes catalogados"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "cat-kpi-1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_cat_resumo",
+                  "fields": [
+                    {
+                      "name": "produtos_com_composicao",
+                      "expression": "`produtos_com_composicao`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "produtos_com_composicao",
+                  "displayName": "Produtos com composição"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Produtos com composição"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 2,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "cat-kpi-2",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_cat_resumo",
+                  "fields": [
+                    {
+                      "name": "media_ingredientes_por_produto",
+                      "expression": "`media_ingredientes_por_produto`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "media_ingredientes_por_produto",
+                  "displayName": "Ingredientes por produto (média)",
+                  "format": {
+                    "type": "number-plain",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 1
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Ingredientes por produto (média)"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 2,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "cat-kpi-3",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_cat_resumo",
+                  "fields": [
+                    {
+                      "name": "pct_irritacao_alta",
+                      "expression": "`pct_irritacao_alta`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "pct_irritacao_alta",
+                  "displayName": "Ingredientes com risco alto de irritação (%)",
+                  "format": {
+                    "type": "number-plain",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 1
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Ingredientes com risco alto de irritação (%)"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 2,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "cat-risco",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_ing_risco",
+                  "fields": [
+                    {
+                      "name": "faixa_irritacao",
+                      "expression": "`faixa_irritacao`"
+                    },
+                    {
+                      "name": "faixa_ambiental",
+                      "expression": "`faixa_ambiental`"
+                    },
+                    {
+                      "name": "sum(ingredientes)",
+                      "expression": "SUM(`ingredientes`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "faixa_irritacao",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Risco de irritação"
+                },
+                "y": {
+                  "fieldName": "sum(ingredientes)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Ingredientes"
+                },
+                "color": {
+                  "fieldName": "faixa_ambiental",
+                  "displayName": "Risco ambiental",
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "1. baixo",
+                        "color": "#CDB3E3"
+                      },
+                      {
+                        "value": "2. médio",
+                        "color": "#580BA5"
+                      },
+                      {
+                        "value": "3. alto",
+                        "color": "#A21561"
+                      }
+                    ]
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Ingredientes por risco de irritação e ambiental"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 5,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "cat-composicao",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_composicao",
+                  "fields": [
+                    {
+                      "name": "product_category_name",
+                      "expression": "`product_category_name`"
+                    },
+                    {
+                      "name": "ingredientes",
+                      "expression": "`ingredientes`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "box",
+              "encodings": {
+                "x": {
+                  "fieldName": "product_category_name",
+                  "displayName": "Categoria",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "ingredientes",
+                  "displayName": "Ingredientes no rótulo",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Quantos ingredientes cada produto tem, por categoria",
+                "showDescription": true,
+                "description": "Categorias com pelo menos 4 produtos"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 5,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "cat-efeitos-pele",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_efeitos",
+                  "fields": [
+                    {
+                      "name": "tag_perfil",
+                      "expression": "`tag_perfil`"
+                    },
+                    {
+                      "name": "tipo_efeito",
+                      "expression": "`tipo_efeito`"
+                    },
+                    {
+                      "name": "sum(ingredientes)",
+                      "expression": "SUM(`ingredientes`)"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`categoria_tag` = 'skin'"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "mark": {
+                "layout": "stack-100"
+              },
+              "encodings": {
+                "x": {
+                  "fieldName": "sum(ingredientes)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Ingredientes"
+                },
+                "y": {
+                  "fieldName": "tag_perfil",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Perfil de pele"
+                },
+                "color": {
+                  "fieldName": "tipo_efeito",
+                  "displayName": "Efeito",
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "1. Benefício",
+                        "color": "#321B5D"
+                      },
+                      {
+                        "value": "2. Neutro",
+                        "color": "#CDB3E3"
+                      },
+                      {
+                        "value": "3. Atenção",
+                        "color": "#9A9AA2"
+                      },
+                      {
+                        "value": "4. Risco",
+                        "color": "#A21561"
+                      },
+                      {
+                        "value": "5. Contraindicação",
+                        "color": "#A21561"
+                      }
+                    ]
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Efeito dos ingredientes em cada perfil de pele",
+                "showDescription": true,
+                "description": "Proporção de ingredientes com benefício, risco ou contraindicação para o perfil"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 11,
+            "width": 12,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "cat-top-ingredientes",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_ing_top",
+                  "fields": [
+                    {
+                      "name": "ranking",
+                      "expression": "`ranking`"
+                    },
+                    {
+                      "name": "ingrediente",
+                      "expression": "`ingrediente`"
+                    },
+                    {
+                      "name": "categoria_ingrediente",
+                      "expression": "`categoria_ingrediente`"
+                    },
+                    {
+                      "name": "faixa_irritacao",
+                      "expression": "`faixa_irritacao`"
+                    },
+                    {
+                      "name": "comedogenico",
+                      "expression": "`comedogenico`"
+                    },
+                    {
+                      "name": "produtos",
+                      "expression": "`produtos`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "ranking",
+                    "displayName": "#"
+                  },
+                  {
+                    "fieldName": "ingrediente",
+                    "displayName": "Ingrediente"
+                  },
+                  {
+                    "fieldName": "categoria_ingrediente",
+                    "displayName": "Categoria"
+                  },
+                  {
+                    "fieldName": "faixa_irritacao",
+                    "displayName": "Irritação"
+                  },
+                  {
+                    "fieldName": "comedogenico",
+                    "displayName": "Comedogênico"
+                  },
+                  {
+                    "fieldName": "produtos",
+                    "displayName": "Produtos"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Ingredientes mais presentes nos produtos"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 19,
+            "width": 12,
+            "height": 7
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "usuarios",
+      "displayName": "Base de usuários",
+      "layout": [
+        {
+          "widget": {
+            "name": "titulo-usuarios",
+            "multilineTextboxSpec": {
+              "lines": [
+                "# Base de usuários\n",
+                "\n",
+                "Quem são as pessoas cadastradas no Venus, pelo perfil que preencheram no app."
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-total-usuarios",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_usuarios",
+                  "fields": [
+                    {
+                      "name": "sum(usuarios)",
+                      "expression": "SUM(`usuarios`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Contas cadastradas",
+                "showDescription": true,
+                "description": "Contas com status ativo (nao indica uso do app)"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(usuarios)",
+                  "displayName": "Contas"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 4,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "pizza-perfil",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_usuarios",
+                  "fields": [
+                    {
+                      "name": "perfil",
+                      "expression": "`perfil`"
+                    },
+                    {
+                      "name": "sum(usuarios)",
+                      "expression": "SUM(`usuarios`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "sum(usuarios)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Usuários"
+                },
+                "color": {
+                  "fieldName": "perfil",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Perfil"
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Perfil preenchido?"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 2,
+            "width": 8,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "usuarios-pele",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_usuarios",
+                  "fields": [
+                    {
+                      "name": "tipo_pele",
+                      "expression": "`tipo_pele`"
+                    },
+                    {
+                      "name": "sum(usuarios)",
+                      "expression": "SUM(`usuarios`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "tipo_pele",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "value"
+                    }
+                  },
+                  "displayName": "Tipo de pele"
+                },
+                "y": {
+                  "fieldName": "sum(usuarios)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Usuários"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Usuários por tipo de pele"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 7,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "usuarios-cabelo",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_usuarios",
+                  "fields": [
+                    {
+                      "name": "tipo_cabelo",
+                      "expression": "`tipo_cabelo`"
+                    },
+                    {
+                      "name": "sum(usuarios)",
+                      "expression": "SUM(`usuarios`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "tipo_cabelo",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "value"
+                    }
+                  },
+                  "displayName": "Tipo de cabelo"
+                },
+                "y": {
+                  "fieldName": "sum(usuarios)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Usuários"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Usuários por tipo de cabelo"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 7,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "usuarios-idade",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_usuarios",
+                  "fields": [
+                    {
+                      "name": "faixa_etaria",
+                      "expression": "`faixa_etaria`"
+                    },
+                    {
+                      "name": "sum(usuarios)",
+                      "expression": "SUM(`usuarios`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "faixa_etaria",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "value"
+                    }
+                  },
+                  "displayName": "Faixa etária"
+                },
+                "y": {
+                  "fieldName": "sum(usuarios)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Usuários"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Usuários por faixa etária"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 12,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "usuarios-sensibilidade",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_usuarios",
+                  "fields": [
+                    {
+                      "name": "sensibilidade",
+                      "expression": "`sensibilidade`"
+                    },
+                    {
+                      "name": "sum(usuarios)",
+                      "expression": "SUM(`usuarios`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sensibilidade",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "value"
+                    }
+                  },
+                  "displayName": "Sensibilidade da pele"
+                },
+                "y": {
+                  "fieldName": "sum(usuarios)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Usuários"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Usuários por sensibilidade da pele"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 12,
+            "width": 6,
+            "height": 5
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "pipeline",
+      "displayName": "Saúde do pipeline",
+      "layout": [
+        {
+          "widget": {
+            "name": "titulo-pipeline",
+            "multilineTextboxSpec": {
+              "lines": [
+                "# Saúde do pipeline\n",
+                "\n",
+                "Resultado da última validação: os KPIs calculados no Databricks (camada gold) comparados com as views analíticas do Postgres (schema venus_bi). Fluxo diário: Postgres (Aiven) → bronze → silver → gold → validação."
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "tabela-validacao",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_validacao",
+                  "fields": [
+                    {
+                      "name": "verificacao",
+                      "expression": "`verificacao`"
+                    },
+                    {
+                      "name": "status",
+                      "expression": "`status`"
+                    },
+                    {
+                      "name": "detalhe",
+                      "expression": "`detalhe`"
+                    },
+                    {
+                      "name": "executado_em",
+                      "expression": "`executado_em`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "verificacao",
+                    "displayName": "Verificação"
+                  },
+                  {
+                    "fieldName": "status",
+                    "displayName": "Status"
+                  },
+                  {
+                    "fieldName": "detalhe",
+                    "displayName": "Detalhe"
+                  },
+                  {
+                    "fieldName": "executado_em",
+                    "displayName": "Executado em"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Validação Databricks × Postgres"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 12,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "filtros",
+      "displayName": "Filtros",
+      "layout": [
+        {
+          "widget": {
+            "name": "f-origem",
+            "queries": [
+              {
+                "name": "f-origem_ds_cards",
+                "query": {
+                  "datasetName": "ds_cards",
+                  "fields": [
+                    {
+                      "name": "origem_dado",
+                      "expression": "`origem_dado`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "f-origem_ds_diario",
+                "query": {
+                  "datasetName": "ds_diario",
+                  "fields": [
+                    {
+                      "name": "origem_dado",
+                      "expression": "`origem_dado`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "f-origem_ds_recomendacao",
+                "query": {
+                  "datasetName": "ds_recomendacao",
+                  "fields": [
+                    {
+                      "name": "origem_dado",
+                      "expression": "`origem_dado`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "f-origem_ds_produtos",
+                "query": {
+                  "datasetName": "ds_produtos",
+                  "fields": [
+                    {
+                      "name": "origem_dado",
+                      "expression": "`origem_dado`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "f-origem_ds_detalhe",
+                "query": {
+                  "datasetName": "ds_detalhe",
+                  "fields": [
+                    {
+                      "name": "origem_dado",
+                      "expression": "`origem_dado`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "f-origem_ds_personalizacao",
+                "query": {
+                  "datasetName": "ds_personalizacao",
+                  "fields": [
+                    {
+                      "name": "origem_dado",
+                      "expression": "`origem_dado`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "origem_dado",
+                    "displayName": "Origem do dado",
+                    "queryName": "f-origem_ds_cards"
+                  },
+                  {
+                    "fieldName": "origem_dado",
+                    "displayName": "Origem do dado",
+                    "queryName": "f-origem_ds_diario"
+                  },
+                  {
+                    "fieldName": "origem_dado",
+                    "displayName": "Origem do dado",
+                    "queryName": "f-origem_ds_recomendacao"
+                  },
+                  {
+                    "fieldName": "origem_dado",
+                    "displayName": "Origem do dado",
+                    "queryName": "f-origem_ds_produtos"
+                  },
+                  {
+                    "fieldName": "origem_dado",
+                    "displayName": "Origem do dado",
+                    "queryName": "f-origem_ds_detalhe"
+                  },
+                  {
+                    "fieldName": "origem_dado",
+                    "displayName": "Origem do dado",
+                    "queryName": "f-origem_ds_personalizacao"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Origem do dado"
+              },
+              "selection": {
+                "defaultSelection": {
+                  "values": {
+                    "dataType": "STRING",
+                    "values": [
+                      {
+                        "value": "real"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "f-periodo",
+            "queries": [
+              {
+                "name": "f-periodo_ds_diario",
+                "query": {
+                  "datasetName": "ds_diario",
+                  "fields": [
+                    {
+                      "name": "data",
+                      "expression": "`data`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "f-periodo_ds_detalhe",
+                "query": {
+                  "datasetName": "ds_detalhe",
+                  "fields": [
+                    {
+                      "name": "data",
+                      "expression": "`data`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-date-range-picker",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "data",
+                    "displayName": "Período",
+                    "queryName": "f-periodo_ds_diario"
+                  },
+                  {
+                    "fieldName": "data",
+                    "displayName": "Período",
+                    "queryName": "f-periodo_ds_detalhe"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Período"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "f-pele",
+            "queries": [
+              {
+                "name": "f-pele_ds_recomendacao",
+                "query": {
+                  "datasetName": "ds_recomendacao",
+                  "fields": [
+                    {
+                      "name": "tipo_pele",
+                      "expression": "`tipo_pele`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "f-pele_ds_detalhe",
+                "query": {
+                  "datasetName": "ds_detalhe",
+                  "fields": [
+                    {
+                      "name": "tipo_pele",
+                      "expression": "`tipo_pele`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "f-pele_ds_usuarios",
+                "query": {
+                  "datasetName": "ds_usuarios",
+                  "fields": [
+                    {
+                      "name": "tipo_pele",
+                      "expression": "`tipo_pele`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "tipo_pele",
+                    "displayName": "Tipo de pele",
+                    "queryName": "f-pele_ds_recomendacao"
+                  },
+                  {
+                    "fieldName": "tipo_pele",
+                    "displayName": "Tipo de pele",
+                    "queryName": "f-pele_ds_detalhe"
+                  },
+                  {
+                    "fieldName": "tipo_pele",
+                    "displayName": "Tipo de pele",
+                    "queryName": "f-pele_ds_usuarios"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Tipo de pele"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "f-categoria",
+            "queries": [
+              {
+                "name": "f-categoria_ds_produtos",
+                "query": {
+                  "datasetName": "ds_produtos",
+                  "fields": [
+                    {
+                      "name": "categoria",
+                      "expression": "`categoria`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "f-categoria_ds_detalhe",
+                "query": {
+                  "datasetName": "ds_detalhe",
+                  "fields": [
+                    {
+                      "name": "categoria",
+                      "expression": "`categoria`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "f-categoria_ds_personalizacao",
+                "query": {
+                  "datasetName": "ds_personalizacao",
+                  "fields": [
+                    {
+                      "name": "categoria",
+                      "expression": "`categoria`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "categoria",
+                    "displayName": "Categoria",
+                    "queryName": "f-categoria_ds_produtos"
+                  },
+                  {
+                    "fieldName": "categoria",
+                    "displayName": "Categoria",
+                    "queryName": "f-categoria_ds_detalhe"
+                  },
+                  {
+                    "fieldName": "categoria",
+                    "displayName": "Categoria",
+                    "queryName": "f-categoria_ds_personalizacao"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Categoria"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_GLOBAL_FILTERS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "canvasBackgroundColor": {
+        "light": "#F4F4F5",
+        "dark": "#121214"
+      },
+      "widgetBackgroundColor": {
+        "light": "#FFFFFF",
+        "dark": "#18181B"
+      },
+      "widgetBorderColor": {
+        "light": "#FFFFFF",
+        "dark": "#18181B"
+      },
+      "fontColor": {
+        "light": "#111113",
+        "dark": "#F2F2F3"
+      },
+      "selectionColor": {
+        "light": "#580BA5",
+        "dark": "#CDB3E3"
+      },
+      "visualizationColors": [
+        "#580BA5",
+        "#A21561",
+        "#CDB3E3",
+        "#321B5D",
+        "#9A9AA2"
+      ],
+      "widgetHeaderAlignment": "LEFT"
+    },
+    "applyModeEnabled": false
+  }
+}
