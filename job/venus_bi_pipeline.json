@@ -1,0 +1,103 @@
+{
+  "email_notifications": {
+    "no_alert_for_skipped_runs": false
+  },
+  "format": "MULTI_TASK",
+  "max_concurrent_runs": 1,
+  "name": "Venus BI · pipeline diário",
+  "performance_target": "PERFORMANCE_OPTIMIZED",
+  "queue": {
+    "enabled": true
+  },
+  "schedule": {
+    "pause_status": "UNPAUSED",
+    "quartz_cron_expression": "53 0 4 * * ?",
+    "timezone_id": "America/Sao_Paulo"
+  },
+  "tasks": [
+    {
+      "disabled": false,
+      "email_notifications": {},
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/sophia.castro@institutojef.org.br/Venus_Bronze",
+        "source": "WORKSPACE"
+      },
+      "run_if": "ALL_SUCCESS",
+      "task_key": "venusbronze",
+      "timeout_seconds": 0,
+      "webhook_notifications": {}
+    },
+    {
+      "depends_on": [
+        {
+          "task_key": "venusbronze"
+        }
+      ],
+      "disabled": false,
+      "email_notifications": {},
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/sophia.castro@institutojef.org.br/Venus_Silver",
+        "source": "WORKSPACE"
+      },
+      "run_if": "ALL_SUCCESS",
+      "task_key": "venussilver",
+      "timeout_seconds": 0,
+      "webhook_notifications": {}
+    },
+    {
+      "depends_on": [
+        {
+          "task_key": "venussilver"
+        }
+      ],
+      "disabled": false,
+      "email_notifications": {},
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/sophia.castro@institutojef.org.br/Venus_Gold",
+        "source": "WORKSPACE"
+      },
+      "run_if": "ALL_SUCCESS",
+      "task_key": "venusgold",
+      "timeout_seconds": 0,
+      "webhook_notifications": {}
+    },
+    {
+      "depends_on": [
+        {
+          "task_key": "venusgold"
+        },
+        {
+          "task_key": "venuscatalogo"
+        }
+      ],
+      "disabled": false,
+      "email_notifications": {},
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/sophia.castro@institutojef.org.br/Venus_Validacao",
+        "source": "WORKSPACE"
+      },
+      "run_if": "ALL_SUCCESS",
+      "task_key": "venusvalidacao",
+      "timeout_seconds": 0
+    },
+    {
+      "depends_on": [
+        {
+          "task_key": "venussilver"
+        }
+      ],
+      "disabled": false,
+      "email_notifications": {},
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/sophia.castro@institutojef.org.br/Venus_Catalogo",
+        "source": "WORKSPACE"
+      },
+      "run_if": "ALL_SUCCESS",
+      "task_key": "venuscatalogo",
+      "timeout_seconds": 0,
+      "webhook_notifications": {}
+    }
+  ],
+  "timeout_seconds": 0,
+  "webhook_notifications": {}
+}
