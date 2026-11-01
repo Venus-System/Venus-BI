@@ -218,3 +218,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# arquivos locais gerados fora do repositório
+Claude outputs/
