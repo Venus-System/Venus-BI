@@ -210,7 +210,7 @@ A direção do desvio não diz sozinha se o resultado é bom. Tempo de processam
 
 ## 7. O dashboard
 
-Construído no AI/BI Dashboards do Databricks. Os 13 datasets leem apenas tabelas de `workspace.gold`.
+Construído no AI/BI Dashboards do Databricks. Os 15 datasets leem apenas tabelas de `workspace.gold`.
 
 | Página | O que mostra | Pergunta que responde |
 |---|---|---|
