@@ -1,0 +1,11 @@
+[tool.ruff]
+line-length = 140
+# Notebooks exportados do Databricks: `spark`, `dbutils` e `display` são injetados pelo runtime.
+builtins = ["spark", "dbutils", "display"]
+
+[tool.ruff.lint.per-file-ignores]
+# Notebooks do pipeline:
+# - E402/B018: células importam no meio do arquivo e terminam com expressões soltas.
+# - BLE001: cada ingestão/verificação captura qualquer erro de propósito, para registrar todas as falhas antes de parar.
+# - TRY002: o `raise Exception` final é o que marca a tarefa do Job como falha; não há quem capture uma exceção própria.
+"notebooks/*.py" = ["E402", "B018", "BLE001", "TRY002"]
