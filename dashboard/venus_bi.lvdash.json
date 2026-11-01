@@ -132,6 +132,13 @@
       "queryLines": [
         "SELECT uf, estado, usuarios, usuarios_com_analise, analises, latitude, longitude FROM workspace.gold.usuarios_por_estado "
       ]
+    },
+    {
+      "name": "ds_paises",
+      "displayName": "Usuários por país",
+      "queryLines": [
+        "SELECT 'Brazil' AS pais, SUM(usuarios) AS usuarios, SUM(analises) AS analises FROM workspace.gold.usuarios_por_estado "
+      ]
     }
   ],
   "pages": [
@@ -2352,11 +2359,11 @@
               {
                 "name": "main_query",
                 "query": {
-                  "datasetName": "ds_estados",
+                  "datasetName": "ds_paises",
                   "fields": [
                     {
-                      "name": "estado",
-                      "expression": "`estado`"
+                      "name": "pais",
+                      "expression": "`pais`"
                     },
                     {
                       "name": "sum(usuarios)",
@@ -2374,15 +2381,10 @@
                 "region": {
                   "regionType": "mapbox-v4-admin",
                   "admin0": {
-                    "type": "value",
-                    "value": "Brazil",
-                    "geographicRole": "admin0-name"
-                  },
-                  "admin1": {
-                    "fieldName": "estado",
+                    "fieldName": "pais",
                     "type": "field",
-                    "geographicRole": "admin1-name",
-                    "displayName": "Estado"
+                    "geographicRole": "admin0-name",
+                    "displayName": "País"
                   }
                 },
                 "color": {
@@ -2394,7 +2396,7 @@
                       "mode": "custom-sequential",
                       "colors": {
                         "start": "#CDB3E3",
-                        "end": "#321B5D"
+                        "end": "#580BA5"
                       }
                     }
                   }
@@ -2404,7 +2406,7 @@
                 "showTitle": true,
                 "title": "Onde estão os usuários",
                 "showDescription": true,
-                "description": "Contas ativas com estado informado no app, por estado"
+                "description": "Contas ativas com localização informada no app, por país. O detalhe por estado está na tabela ao lado"
               }
             }
           },

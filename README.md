@@ -140,7 +140,7 @@ No fim, o notebook confere que nenhuma linha se perdeu entre bronze e silver e q
 | `score_por_produto` | Análises e scores médios por produto | Ranking de produtos |
 | `analise_detalhe` | Uma linha por análise, com perfil, produto e scores | Histograma, boxplot e filtros |
 | `perfil_usuarios` | Contagem de usuários por combinação de perfil | Base de usuários |
-| `usuarios_por_estado` | Contas ativas, contas com análise e análises por estado | Mapa do Brasil |
+| `usuarios_por_estado` | Contas ativas, contas com análise e análises por estado | Mapa e tabela por estado |
 
 O notebook termina conferindo que a soma diária bate com o total da silver e que a tabela de detalhe não duplica análises.
 
@@ -217,7 +217,7 @@ Construído no AI/BI Dashboards do Databricks. Os 13 datasets leem apenas tabela
 | Visão geral | 6 cards com desvio, evolução diária, recomendação por tipo de pele, score por faixa etária, score por categoria, histograma e boxplot | O app está sendo usado? Que resultado as pessoas recebem? |
 | Personalização | Score geral × score personalizado por produto, dispersão e tabela | Quanto a personalização muda a nota? |
 | Catálogo e ingredientes | Risco de irritação, composição por categoria, efeitos por perfil e ranking de ingredientes | O que há nos produtos que o app avalia? |
-| Base de usuários | Perfil das contas cadastradas e mapa do Brasil por estado | Quem são e onde estão os usuários? |
+| Base de usuários | Perfil das contas cadastradas, mapa-múndi por país e tabela por estado | Quem são e onde estão os usuários? |
 | Saúde do pipeline | Resultado da última validação cruzada | Os números são confiáveis? |
 
 **Filtros globais:** origem do dado (padrão `real`), período, tipo de pele e categoria. Cada filtro age apenas nos datasets que têm aquele campo. O catálogo, por exemplo, não muda com o período.
